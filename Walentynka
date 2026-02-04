@@ -1,0 +1,168 @@
+
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Aguś – Walentynka 💖</title>
+  <style>
+    :root{
+      --pink:#ff69b4;
+      --pink-dark:#d94f92;
+      --bg:#ffeaf3;
+      --text:#5a2141;
+      --white:#fff;
+    }
+    body{
+      margin:0;
+      font-family: Arial, sans-serif;
+      background: var(--bg);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      height:100vh;
+      text-align:center;
+    }
+    .card{
+      background:var(--white);
+      padding:30px 20px;
+      border-radius:20px;
+      box-shadow:0 15px 40px rgba(255,105,180,0.35);
+      width:90%;
+      max-width:600px;
+      position:relative;
+    }
+    .gif{
+      width:250px;
+      border-radius:15px;
+      margin-bottom:15px;
+    }
+    h1{
+      color:var(--text);
+      margin-top:0;
+    }
+    .btns{ position:relative; height:120px; }
+    .btn{
+      padding:15px 25px;
+      font-size:20px;
+      border:none;
+      border-radius:12px;
+      font-weight:bold;
+      cursor:pointer;
+      transition:.2s;
+    }
+    #yes{
+      background:var(--pink);
+      color:white;
+      box-shadow:0 8px 20px rgba(255,105,180,0.4);
+    }
+    #yes:hover{
+      background:var(--pink-dark);
+      transform:scale(1.05);
+    }
+    #no{
+      background:#ccc;
+      color:#333;
+      position:absolute;
+      top:0; left:50%;
+      transform:translateX(-50%);
+    }
+    #confetti{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      z-index:9999;
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="confetti"></canvas>
+
+<div class="card" id="card">
+  https://media.tenor.com/5cQEOx4C0hEAAAAM/cat-love.gif
+  <h1>Aguś, czy zostaniesz moją walentynką? 💞</h1>
+
+  <div class="btns">
+    <button id="yes" class="btn">Tak!</button>
+    <button id="no" class="btn">Nie</button>
+  </div>
+</div>
+
+<script>
+  const btnNo = document.getElementById("no");
+  const btnYes = document.getElementById("yes");
+  const card = document.getElementById("card");
+  let yesScale = 1, tries = 0;
+
+  function moveNo(){
+    tries++;
+    const maxX = 250;
+    const maxY = 70;
+    btnNo.style.left = Math.random()*maxX + "px";
+    btnNo.style.top  = Math.random()*maxY + "px";
+
+    yesScale = Math.min(1.6, yesScale + 0.08);
+    btnYes.style.transform = `scale(${yesScale})`;
+
+    const texts = ["Na pewno? 🤔","Proszę… 🥺","No weź… 😘","Pomyśl jeszcze 💗","Serio? 😇"];
+    btnNo.textContent = texts[Math.min(4, Math.floor(tries/2))];
+  }
+
+  btnNo.addEventListener("mouseover", moveNo);
+  btnNo.addEventListener("click", moveNo);
+
+  btnYes.addEventListener("click", ()=>{
+    celebrate();
+    card.innerHTML = `
+      https://media.tenor.com/NT5uWZLxE3QAAAAM/peach-goma.gif
+      <h1>Wiedziałem! 💖</h1>
+      <p>14 lutego jest nasz ✨</p>
+    `;
+  });
+
+  const canvas = document.getElementById("confetti");
+  const ctx = canvas.getContext("2d");
+  let W, H, pieces = [];
+  function fit(){ W = canvas.width = innerWidth; H = canvas.height = innerHeight; }
+  fit(); addEventListener("resize", fit);
+
+  function spawn(n=200){
+    const colors=["#ff69b4","#ffaad7","#ffd1e6","#fff","#d94f92"];
+    for(let i=0;i<n;i++){
+      pieces.push({
+        x:Math.random()*W, y:Math.random()*H - H,
+        w:6+Math.random()*6, h:6+Math.random()*6,
+        color:colors[(Math.random()*colors.length)|0],
+        vx:-2+Math.random()*4, vy:2+Math.random()*4,
+        rot:Math.random()*Math.PI, vr:-0.2+Math.random()*0.4
+      });
+    }
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    pieces.forEach(p=>{
+      p.x+=p.vx; p.y+=p.vy; p.rot+=p.vr;
+      if(p.y>H) p.y=-10;
+      if(p.x>W) p.x=-10;
+      if(p.x<-10) p.x=W+10;
+
+      ctx.save();
+      ctx.translate(p.x,p.y);
+      ctx.rotate(p.rot);
+      ctx.fillStyle=p.color;
+      ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
+      ctx.restore();
+    });
+    requestAnimationFrame(draw);
+  }
+
+  function celebrate(){
+    spawn(250);
+    draw();
+  }
+</script>
+
+</body>
+</html>
